@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NovaPay — Next-Gen Banking</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03050f;
+  --bg2:#060a1a;
+  --cyan:#00f5ff;
+  --cyan2:#00bcd4;
+  --blue:#0066ff;
+  --purple:#7c3aed;
+  --glass:rgba(255,255,255,0.04);
+  --glass-border:rgba(0,245,255,0.12);
+  --glass-border2:rgba(255,255,255,0.08);
+  --text:#e8f4ff;
+  --muted:#5a7a9a;
+  --muted2:#8aabcc;
+  --green:#00ff9d;
+  --red:#ff4466;
+  --card-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(0,245,255,0.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CUSTOM CURSOR */
+#cursor{
+  position:fixed;width:12px;height:12px;
+  background:var(--cyan);border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:transform 0.1s,width 0.2s,height 0.2s,opacity 0.2s;
+  mix-blend-mode:screen;
+  box-shadow:0 0 20px var(--cyan),0 0 40px rgba(0,245,255,0.3);
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(0,245,255,0.4);border-radius:50%;
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:transform 0.15s ease,width 0.3s,height 0.3s;
+}
+
+/* CANVAS */
+#particles-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  opacity:0.7;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--cyan),var(--blue));border-radius:2px}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.2rem 4rem;
+  background:rgba(3,5,15,0.7);
+  backdrop-filter:blur(24px) saturate(180%);
+  border-bottom:1px solid var(--glass-border);
+}
+.logo{
+  font-family:'Syne',sans-serif;
+  font-size:1.4rem;font-weight:800;
+  letter-spacing:-0.02em;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+nav ul{list-style:none;display:flex;gap:2.5rem;align-items:center}
+nav ul a{
+  color:var(--muted2);text-decoration:none;
+  font-size:0.82rem;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;
+  transition:color 0.2s;
+}
+nav ul a:hover{color:var(--cyan)}
+.nav-btn{
+  background:transparent;
+  border:1px solid var(--glass-border);
+  color:var(--cyan) !important;
+  padding:0.5rem 1.4rem !important;
+  border-radius:100px;
+  transition:all 0.3s !important;
+  font-size:0.82rem !important;
+}
+.nav-btn:hover{
+  background:rgba(0,245,255,0.08) !important;
+  border-color:var(--cyan) !important;
+  box-shadow:0 0 20px rgba(0,245,255,0.2) !important;
+}
+
+/* HERO */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:8rem 4rem 4rem;
+  overflow:hidden;
+  text-align:center;
+  z-index:1;
+}
+.hero-glow{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 30%,rgba(0,102,255,0.12) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 60%,rgba(124,58,237,0.08) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 80% 70%,rgba(0,245,255,0.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.hero-content{position:relative;max-width:900px;z-index:2}
+.hero-chip{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(0,245,255,0.06);
+  border:1px solid rgba(0,245,255,0.2);
+  border-radius:100px;padding:0.45rem 1.1rem;
+  font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:2rem;
+  animation:chipIn 0.8s ease both;
+}
+.hero-chip-dot{
+  width:6px;height:6px;background:var(--cyan);
+  border-radius:50%;animation:pulseDot 2s infinite;
+  box-shadow:0 0 8px var(--cyan);
+}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+@keyframes chipIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(3.5rem,8vw,7rem);
+  font-weight:800;line-height:0.95;
+  letter-spacing:-0.04em;
+  margin-bottom:1.5rem;
+  animation:heroIn 1s 0.2s ease both;
+}
+.hero h1 .line1{display:block;color:var(--text)}
+.hero h1 .line2{
+  display:block;
+  background:linear-gradient(135deg,var(--cyan) 0%,var(--blue) 50%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 30px rgba(0,245,255,0.3));
+}
+.hero h1 .line3{display:block;color:rgba(255,255,255,0.2)}
+@keyframes heroIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+.hero-sub{
+  font-size:1.1rem;color:var(--muted2);
+  max-width:550px;margin:0 auto 2.5rem;
+  font-weight:300;line-height:1.9;
+  animation:heroIn 1s 0.4s ease both;
+}
+.hero-actions{
+  display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+  animation:heroIn 1s 0.6s ease both;
+}
+.btn-glow{
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  color:#000;border:none;
+  padding:0.9rem 2.4rem;border-radius:100px;
+  font-size:0.88rem;font-weight:700;
+  font-family:'Syne',sans-serif;
+  cursor:pointer;text-decoration:none;display:inline-block;
+  transition:all 0.3s;letter-spacing:0.04em;
+  box-shadow:0 0 30px rgba(0,245,255,0.25);
+}
+.btn-glow:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 50px rgba(0,245,255,0.4),0 15px 30px rgba(0,102,255,0.3);
+}
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--glass-border);
+  color:var(--text);
+  padding:0.9rem 2.4rem;border-radius:100px;
+  font-size:0.88rem;font-weight:500;
+  cursor:pointer;text-decoration:none;display:inline-block;
+  transition:all 0.3s;
+  backdrop-filter:blur(10px);
+}
+.btn-outline:hover{
+  border-color:rgba(0,245,255,0.4);
+  background:rgba(0,245,255,0.05);
+  transform:translateY(-2px);
+}
+
+/* FLOATING CARDS HERO */
+.hero-cards{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  pointer-events:none;overflow:hidden;
+}
+.float-card{
+  position:absolute;
+  background:var(--glass);
+  border:1px solid var(--glass-border2);
+  border-radius:16px;
+  backdrop-filter:blur(20px);
+  padding:1rem 1.25rem;
+  animation:float linear infinite;
+}
+.float-card:nth-child(1){
+  top:20%;left:5%;width:160px;
+  animation-duration:8s;animation-delay:-2s;
+}
+.float-card:nth-child(2){
+  top:30%;right:6%;width:150px;
+  animation-duration:10s;animation-delay:-5s;
+}
+.float-card:nth-child(3){
+  bottom:25%;left:8%;width:140px;
+  animation-duration:9s;animation-delay:-1s;
+}
+.float-card:nth-child(4){
+  bottom:20%;right:5%;width:160px;
+  animation-duration:11s;animation-delay:-7s;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0) rotate(-1deg)}
+  25%{transform:translateY(-18px) rotate(1deg)}
+  50%{transform:translateY(-8px) rotate(-0.5deg)}
+  75%{transform:translateY(-22px) rotate(0.8deg)}
+}
+.fc-label{font-size:0.65rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.3rem}
+.fc-val{font-family:'Space Mono',monospace;font-size:0.9rem;font-weight:700;color:var(--cyan)}
+.fc-sub{font-size:0.65rem;color:var(--green);margin-top:0.2rem}
+
+/* STATS STRIP */
+.stats-strip{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--glass-border);
+  border-bottom:1px solid var(--glass-border);
+  background:rgba(6,10,26,0.8);
+  backdrop-filter:blur(20px);
+}
+.stat-item{
+  padding:2rem 3rem;
+  border-right:1px solid var(--glass-border);
+  position:relative;overflow:hidden;
+}
+.stat-item:last-child{border-right:none}
+.stat-item::before{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  transform:scaleX(0);transition:transform 0.4s;
+}
+.stat-item:hover::before{transform:scaleX(1)}
+.stat-num{
+  font-family:'Syne',sans-serif;
+  font-size:2.2rem;font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin-bottom:0.3rem;
+}
+.stat-lbl{font-size:0.72rem;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
+
+/* SECTION COMMONS */
+section{position:relative;z-index:2}
+.s-label{
+  font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:0.75rem;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.s-label::before{content:'';flex:0 0 20px;height:1px;background:var(--cyan)}
+.s-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:800;line-height:1.1;letter-spacing:-0.03em;
+  margin-bottom:1rem;
+}
+.s-desc{font-size:0.95rem;color:var(--muted2);line-height:1.9;font-weight:300}
+
+/* GLASS CARD */
+.glass-card{
+  background:rgba(255,255,255,0.025);
+  border:1px solid var(--glass-border2);
+  border-radius:20px;
+  backdrop-filter:blur(30px);
+  position:relative;overflow:hidden;
+}
+.glass-card::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,245,255,0.3),transparent);
+}
+
+/* DEMO SECTION */
+.demo-wrap{
+  padding:6rem 4rem;
+  display:grid;grid-template-columns:1fr 1.1fr;
+  gap:5rem;align-items:center;
+  max-width:1300px;margin:0 auto;
+}
+.app-shell{
+  perspective:1000px;
+}
+.app-inner{
+  transition:transform 0.1s ease;
+  transform-style:preserve-3d;
+}
+.app-ui{
+  background:rgba(6,10,26,0.9);
+  border:1px solid var(--glass-border);
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(0,245,255,0.06),
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 60px rgba(0,102,255,0.08);
+}
+.app-topbar{
+  background:rgba(255,255,255,0.02);
+  padding:1rem 1.5rem;
+  display:flex;align-items:center;gap:0.75rem;
+  border-bottom:1px solid var(--glass-border);
+}
+.dot-row{display:flex;gap:6px}
+.dot2{width:11px;height:11px;border-radius:50%}
+.dot2.r{background:#ff5f57}.dot2.y{background:#febc2e}.dot2.g{background:#28c840}
+.topbar-title{font-size:0.75rem;color:var(--muted);letter-spacing:0.06em;font-family:'Space Mono',monospace}
+
+.app-body{padding:1.5rem}
+
+.balance-orb{
+  background:linear-gradient(135deg,rgba(0,102,255,0.15),rgba(0,245,255,0.08));
+  border:1px solid rgba(0,245,255,0.15);
+  border-radius:16px;padding:1.5rem;
+  margin-bottom:1.25rem;
+  position:relative;overflow:hidden;
+}
+.balance-orb::after{
+  content:'';position:absolute;
+  top:-50%;right:-20%;
+  width:120px;height:120px;
+  background:radial-gradient(circle,rgba(0,245,255,0.08),transparent 70%);
+  border-radius:50%;
+}
+.bal-lbl{font-size:0.68rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem}
+.bal-num{
+  font-family:'Syne',sans-serif;font-size:2.4rem;font-weight:800;
+  color:var(--cyan);letter-spacing:-0.03em;
+  text-shadow:0 0 30px rgba(0,245,255,0.3);
+}
+.bal-change{font-size:0.78rem;color:var(--green);margin-top:0.35rem;display:flex;align-items:center;gap:0.3rem}
+
+/* TABS */
+.tabs{display:flex;background:rgba(255,255,255,0.02);border-radius:10px;padding:3px;margin-bottom:1.25rem;border:1px solid var(--glass-border2)}
+.tab{
+  flex:1;padding:0.55rem;text-align:center;
+  font-size:0.75rem;font-weight:600;letter-spacing:0.05em;
+  color:var(--muted);cursor:pointer;border-radius:8px;
+  transition:all 0.25s;border:none;background:transparent;
+  font-family:'Syne',sans-serif;
+}
+.tab.on{
+  background:linear-gradient(135deg,rgba(0,245,255,0.15),rgba(0,102,255,0.1));
+  color:var(--cyan);
+  box-shadow:0 0 15px rgba(0,245,255,0.1);
+  border:1px solid rgba(0,245,255,0.2);
+}
+
+/* PANELS */
+.panel{display:none}
+.panel.on{display:block}
+
+.inp-row{display:flex;gap:0.75rem}
+.demo-inp{
+  flex:1;background:rgba(255,255,255,0.03);
+  border:1px solid var(--glass-border2);
+  border-radius:10px;padding:0.75rem 1rem;
+  color:var(--text);font-size:0.88rem;
+  font-family:'Space Mono',monospace;
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.demo-inp:focus{
+  border-color:rgba(0,245,255,0.3);
+  box-shadow:0 0 20px rgba(0,245,255,0.08);
+}
+.demo-inp::placeholder{color:var(--muted);font-family:'Inter',sans-serif}
+.act-btn{
+  padding:0.75rem 1.1rem;border-radius:10px;
+  font-size:0.78rem;font-weight:700;cursor:pointer;
+  font-family:'Syne',sans-serif;letter-spacing:0.04em;
+  transition:all 0.2s;white-space:nowrap;border:none;
+}
+.act-btn.dep{
+  background:linear-gradient(135deg,rgba(0,255,157,0.2),rgba(0,245,255,0.1));
+  color:var(--green);border:1px solid rgba(0,255,157,0.25);
+}
+.act-btn.dep:hover{background:linear-gradient(135deg,rgba(0,255,157,0.3),rgba(0,245,255,0.15));box-shadow:0 0 20px rgba(0,255,157,0.15)}
+.act-btn.with{
+  background:rgba(255,68,102,0.1);
+  color:var(--red);border:1px solid rgba(255,68,102,0.2);
+}
+.act-btn.with:hover{background:rgba(255,68,102,0.18);box-shadow:0 0 20px rgba(255,68,102,0.1)}
+
+.feedback{
+  margin-top:0.7rem;padding:0.6rem 0.9rem;
+  border-radius:8px;font-size:0.78rem;font-weight:500;
+  display:none;font-family:'Space Mono',monospace;letter-spacing:0.02em;
+}
+.feedback.ok{display:block;background:rgba(0,255,157,0.08);color:var(--green);border:1px solid rgba(0,255,157,0.2)}
+.feedback.err{display:block;background:rgba(255,68,102,0.08);color:var(--red);border:1px solid rgba(255,68,102,0.2)}
+
+/* TXN LIST */
+.txn{display:flex;align-items:center;padding:0.7rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.txn:last-child{border-bottom:none}
+.txn-ic{
+  width:34px;height:34px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;margin-right:0.75rem;flex-shrink:0;
+}
+.txn-ic.d{background:rgba(0,255,157,0.1)}
+.txn-ic.w{background:rgba(255,68,102,0.1)}
+.txn-nm{font-size:0.82rem;font-weight:500}
+.txn-t{font-size:0.68rem;color:var(--muted)}
+.txn-amt{margin-left:auto;font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700}
+.txn-amt.d{color:var(--green)}.txn-amt.w{color:var(--red)}
+.empty-state{font-size:0.78rem;color:var(--muted);text-align:center;padding:1.5rem 0}
+
+/* FEATURES */
+.feat-section{padding:6rem 4rem;background:rgba(6,10,26,0.6);backdrop-filter:blur(20px);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border)}
+.feat-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;
+  max-width:1200px;margin:3.5rem auto 0;
+}
+.feat-card{
+  padding:2rem;border-radius:20px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--glass-border2);
+  transition:all 0.35s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.feat-card::after{
+  content:'';position:absolute;
+  inset:0;border-radius:20px;
+  background:linear-gradient(135deg,rgba(0,245,255,0.04),transparent);
+  opacity:0;transition:opacity 0.35s;
+}
+.feat-card:hover{
+  border-color:rgba(0,245,255,0.2);
+  transform:translateY(-6px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.4),0 0 30px rgba(0,245,255,0.06);
+}
+.feat-card:hover::after{opacity:1}
+.feat-ico{
+  font-size:1.6rem;margin-bottom:1.25rem;
+  width:52px;height:52px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,245,255,0.06);border:1px solid rgba(0,245,255,0.1);
+}
+.feat-t{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:0.6rem}
+.feat-d{font-size:0.83rem;color:var(--muted2);line-height:1.75}
+
+/* STEPS */
+.steps-section{padding:6rem 4rem;max-width:1200px;margin:0 auto}
+.steps-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;
+  margin-top:4rem;position:relative;
+}
+.steps-row::before{
+  content:'';position:absolute;
+  top:2.8rem;left:calc(12.5% + 1px);right:calc(12.5% + 1px);
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(0,245,255,0.3),rgba(0,102,255,0.3),rgba(0,245,255,0.3),transparent);
+}
+.step-box{text-align:center}
+.step-n{
+  width:56px;height:56px;margin:0 auto 1.25rem;
+  border-radius:14px;
+  background:rgba(0,245,255,0.06);
+  border:1px solid rgba(0,245,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;
+  color:var(--cyan);position:relative;z-index:1;
+  box-shadow:0 0 20px rgba(0,245,255,0.08);
+}
+.step-t{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:0.5rem}
+.step-d{font-size:0.8rem;color:var(--muted2);line-height:1.7}
+
+/* KYC */
+.kyc-section{padding:6rem 4rem;background:rgba(6,10,26,0.7);border-top:1px solid var(--glass-border)}
+.kyc-wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.kyc-panel{
+  background:rgba(255,255,255,0.02);
+  border:1px solid var(--glass-border2);
+  border-radius:20px;padding:2rem;
+}
+.kyc-hdr{font-size:0.7rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1.25rem}
+.kyc-row2{display:flex;align-items:center;gap:1rem;padding:0.85rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.kyc-row2:last-child{border-bottom:none}
+.kyc-ic{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(0,245,255,0.06);border:1px solid rgba(0,245,255,0.1);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+}
+.kyc-nm{font-size:0.83rem;font-weight:500}
+.kyc-no{font-size:0.7rem;color:var(--muted);font-family:'Space Mono',monospace;letter-spacing:0.05em}
+.kyc-badge{
+  margin-left:auto;font-size:0.67rem;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--green);background:rgba(0,255,157,0.08);
+  border:1px solid rgba(0,255,157,0.2);
+  padding:0.25rem 0.65rem;border-radius:100px;
+}
+
+/* CTA */
+.cta{
+  padding:10rem 4rem;text-align:center;position:relative;overflow:hidden;
+}
+.cta-glow{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(0,102,255,0.12),transparent 70%);
+  pointer-events:none;
+}
+.cta-grid-bg{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,245,255,0.03) 1px,transparent 1px);
+  background-size:50px 50px;
+  mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,black,transparent);
+}
+.cta h2{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(3rem,6vw,5rem);
+  font-weight:800;letter-spacing:-0.04em;
+  line-height:1;margin-bottom:1.5rem;
+  background:linear-gradient(135deg,var(--text),rgba(255,255,255,0.5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.cta p{
+  font-size:1rem;color:var(--muted2);max-width:480px;
+  margin:0 auto 3rem;font-weight:300;line-height:1.9;
+}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--glass-border);
+  padding:2rem 4rem;
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:1rem;
+  background:rgba(3,5,15,0.8);backdrop-filter:blur(20px);
+}
+.ft-note{font-size:0.75rem;color:var(--muted);font-family:'Space Mono',monospace}
+.ft-links{display:flex;gap:2rem}
+.ft-links a{font-size:0.75rem;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.ft-links a:hover{color:var(--cyan)}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:0.1s}
+.reveal-d2{transition-delay:0.2s}
+.reveal-d3{transition-delay:0.3s}
+
+/* GLOW LINE */
+.glow-line{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent);
+  opacity:0.3;
+}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  nav ul{display:none}
+  .hero,.feat-section,.steps-section,.kyc-section,.cta,footer{padding-left:1.5rem;padding-right:1.5rem}
+  .demo-wrap{grid-template-columns:1fr;gap:3rem;padding:4rem 1.5rem}
+  .feat-grid{grid-template-columns:1fr}
+  .steps-row{grid-template-columns:1fr 1fr}
+  .steps-row::before{display:none}
+  .kyc-wrap{grid-template-columns:1fr;gap:3rem}
+  .stats-strip{grid-template-columns:1fr 1fr}
+  .stat-item{border-right:none;border-bottom:1px solid var(--glass-border)}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">NovaPay</div>
+  <ul>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">Process</a></li>
+    <li><a href="#kyc">KYC</a></li>
+    <li><a href="#demo" class="nav-btn">Try Demo</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+
+  <!-- Floating ambient cards -->
+  <div class="hero-cards">
+    <div class="float-card glass-card">
+      <div class="fc-label">Balance</div>
+      <div class="fc-val">₹24,500</div>
+      <div class="fc-sub">↑ +₹2,000 today</div>
+    </div>
+    <div class="float-card glass-card">
+      <div class="fc-label">KYC Status</div>
+      <div class="fc-val" style="color:var(--green)">Verified</div>
+      <div class="fc-sub">3 documents</div>
+    </div>
+    <div class="float-card glass-card">
+      <div class="fc-label">Last Txn</div>
+      <div class="fc-val">-₹500</div>
+      <div class="fc-sub" style="color:var(--red)">Withdrawal</div>
+    </div>
+    <div class="float-card glass-card">
+      <div class="fc-label">Security</div>
+      <div class="fc-val">100%</div>
+      <div class="fc-sub">Encrypted</div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+
+    <h1>
+      <span class="line1">Banking for the</span>
+      <span class="line2">Future Generation</span>
+      <span class="line3">—Reimagined—</span>
+    </h1>
+    <p class="hero-sub">A secure, intelligent banking platform with real-time balance management, KYC verification, and instant transactions — built from the ground up.</p>
+    <div class="hero-actions">
+      <a href="#demo" class="btn-glow">Launch Demo</a>
+      <a href="#features" class="btn-outline">Explore Features</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip reveal">
+  <div class="stat-item">
+    <div class="stat-num">₹0</div>
+    <div class="stat-lbl">Opening Balance</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">256-bit</div>
+    <div class="stat-lbl">Encryption Ready</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">KYC</div>
+    <div class="stat-lbl">Full Compliance</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">0ms</div>
+    <div class="stat-lbl">Transaction Delay</div>
+  </div>
+</div>
+
+<div class="glow-line"></div>
+
+<!-- DEMO -->
+<section id="demo">
+  <div class="demo-wrap">
+    <!-- Left text -->
+    <div>
+      <div class="s-label reveal">Interactive Demo</div>
+      <h2 class="s-title reveal reveal-d1">Experience <span style="background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Real-Time</span><br/>Banking</h2>
+      <p class="s-desc reveal reveal-d2" style="margin-bottom:2rem">Interact with a live simulation of NovaPay's core banking engine. Deposit funds, withdraw, and watch your balance update in real time — right here in your browser.</p>
+      <div style="display:flex;flex-direction:column;gap:0.9rem">
+        <div class="reveal reveal-d1" style="display:flex;align-items:center;gap:0.8rem;font-size:0.85rem;color:var(--muted2)">
+          <span style="color:var(--cyan);font-size:1rem">◈</span> Real-time balance updates with animated feedback
+        </div>
+        <div class="reveal reveal-d2" style="display:flex;align-items:center;gap:0.8rem;font-size:0.85rem;color:var(--muted2)">
+          <span style="color:var(--cyan);font-size:1rem">◈</span> Full input validation — mirrors the Python backend
+        </div>
+        <div class="reveal reveal-d3" style="display:flex;align-items:center;gap:0.8rem;font-size:0.85rem;color:var(--muted2)">
+          <span style="color:var(--cyan);font-size:1rem">◈</span> Transaction history with timestamps
+        </div>
+      </div>
+    </div>
+
+    <!-- App shell with 3D tilt -->
+    <div class="app-shell reveal reveal-d2" id="tiltShell">
+      <div class="app-inner" id="tiltInner">
+        <div class="app-ui">
+          <div class="app-topbar">
+            <div class="dot-row">
+              <span class="dot2 r"></span><span class="dot2 y"></span><span class="dot2 g"></span>
+            </div>
+            <span class="topbar-title">novapay://banking-engine v2.0</span>
+          </div>
+          <div class="app-body">
+
+            <!-- Balance -->
+            <div class="balance-orb">
+              <div class="bal-lbl">Current Balance</div>
+              <div class="bal-num" id="balDisp">₹0.00</div>
+              <div class="bal-change" id="balSub">
+                <span>●</span><span>Ready to transact</span>
+              </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+              <button class="tab on" onclick="switchTab('dep')">Deposit</button>
+              <button class="tab" onclick="switchTab('wit')">Withdraw</button>
+              <button class="tab" onclick="switchTab('his')">History</button>
+              <button class="tab" onclick="switchTab('kyc')">KYC</button>
+            </div>
+
+            <!-- Deposit Panel -->
+            <div class="panel on" id="pan-dep">
+              <div class="inp-row">
+                <input type="number" class="demo-inp" id="depInp" placeholder="Amount in ₹" min="1"/>
+                <button class="act-btn dep" onclick="doDeposit()">+ Deposit</button>
+              </div>
+              <div class="feedback" id="depMsg"></div>
+            </div>
+
+            <!-- Withdraw Panel -->
+            <div class="panel" id="pan-wit">
+              <div class="inp-row">
+                <input type="number" class="demo-inp" id="witInp" placeholder="Amount in ₹" min="1"/>
+                <button class="act-btn with" onclick="doWithdraw()">- Withdraw</button>
+              </div>
+              <div class="feedback" id="witMsg"></div>
+            </div>
+
+            <!-- History Panel -->
+            <div class="panel" id="pan-his">
+              <div id="txnList"><div class="empty-state">No transactions yet. Make your first deposit!</div></div>
+            </div>
+
+            <!-- KYC Panel -->
+            <div class="panel" id="pan-kyc">
+              <div class="inp-row" style="margin-bottom:0.6rem">
+                <input type="text" class="demo-inp" id="kycType" placeholder="Document type (e.g. Aadhaar)"/>
+              </div>
+              <div class="inp-row">
+                <input type="text" class="demo-inp" id="kycNum" placeholder="Document number"/>
+                <button class="act-btn dep" onclick="addKYC()">+ Add</button>
+              </div>
+              <div class="feedback" id="kycMsg"></div>
+              <div id="kycList" style="margin-top:0.9rem"><div class="empty-state">No KYC documents added yet.</div></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- FEATURES -->
+<section id="features" class="feat-section">
+  <div style="text-align:center;max-width:600px;margin:0 auto" class="reveal">
+    <div class="s-label" style="justify-content:center">Core Capabilities</div>
+    <h2 class="s-title">Engineered for<br/><span style="background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Precision</span></h2>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card reveal">
+      <div class="feat-ico">💰</div>
+      <div class="feat-t">Smart Deposits</div>
+      <p class="feat-d">Instantly add funds with complete validation. Zero negative deposits, zero silent failures — every transaction confirmed with precision.</p>
+    </div>
+    <div class="feat-card reveal reveal-d1">
+      <div class="feat-ico">🏧</div>
+      <div class="feat-t">Safe Withdrawals</div>
+      <p class="feat-d">Built-in overdraft protection prevents costly mistakes. Clear real-time messaging on every action, success or failure.</p>
+    </div>
+    <div class="feat-card reveal reveal-d2">
+      <div class="feat-ico">📊</div>
+      <div class="feat-t">Live Balance Tracking</div>
+      <p class="feat-d">Monitor your balance in real time. Every transaction updates your account instantly with full transparency and accuracy.</p>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-ico">🪪</div>
+      <div class="feat-t">KYC Management</div>
+      <p class="feat-d">Store and retrieve identity documents securely. Aadhaar, PAN, Passport — all in one encrypted registry.</p>
+    </div>
+    <div class="feat-card reveal reveal-d1">
+      <div class="feat-ico">🛡️</div>
+      <div class="feat-t">Input Validation</div>
+      <p class="feat-d">Robust error handling prevents crashes and invalid states. Every edge case is handled gracefully — your data is always safe.</p>
+    </div>
+    <div class="feat-card reveal reveal-d2">
+      <div class="feat-ico">⚡</div>
+      <div class="feat-t">Instant Feedback</div>
+      <p class="feat-d">Every action returns an immediate, clear response. You always know exactly what happened and why.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="steps-section">
+  <div style="text-align:center" class="reveal">
+    <div class="s-label" style="justify-content:center">How It Works</div>
+    <h2 class="s-title">Four Steps to <span style="background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Control</span></h2>
+  </div>
+  <div class="steps-row">
+    <div class="step-box reveal">
+      <div class="step-n">01</div>
+      <div class="step-t">Launch App</div>
+      <p class="step-d">Run the Python script. The welcome menu initialises instantly — no setup required.</p>
+    </div>
+    <div class="step-box reveal reveal-d1">
+      <div class="step-n">02</div>
+      <div class="step-t">Deposit Funds</div>
+      <p class="step-d">Add your opening balance. Any positive amount, validated and confirmed immediately.</p>
+    </div>
+    <div class="step-box reveal reveal-d2">
+      <div class="step-n">03</div>
+      <div class="step-t">Transact Freely</div>
+      <p class="step-d">Withdraw, check balances, update KYC — all from a clean interactive menu.</p>
+    </div>
+    <div class="step-box reveal reveal-d3">
+      <div class="step-n">04</div>
+      <div class="step-t">Exit Safely</div>
+      <p class="step-d">Session maintained throughout. Exit cleanly with a single command, no data lost.</p>
+    </div>
+  </div>
+</section>
+
+<!-- KYC -->
+<section id="kyc" class="kyc-section">
+  <div class="kyc-wrap">
+    <div>
+      <div class="s-label reveal">Identity & Compliance</div>
+      <h2 class="s-title reveal reveal-d1">KYC, <span style="background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Simplified</span></h2>
+      <p class="s-desc reveal reveal-d2" style="margin-bottom:2rem">Store all your identity documents in one secure place. Add any document type and retrieve them instantly whenever needed. Full compliance built in from day one.</p>
+      <a href="#demo" class="btn-glow reveal reveal-d3" style="display:inline-block">Start Verifying →</a>
+    </div>
+    <div class="kyc-panel glass-card reveal reveal-d2">
+      <div class="kyc-hdr">Your Documents on File</div>
+      <div id="kycSectionList">
+        <div class="kyc-row2"><div style="font-size:0.82rem;color:var(--muted);padding:0.5rem 0">No documents added yet. Use the demo above to add KYC documents.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-glow"></div>
+  <div class="cta-grid-bg"></div>
+  <div style="position:relative;z-index:2">
+    <div class="s-label reveal" style="justify-content:center">Ready?</div>
+    <h2 class="reveal reveal-d1">Bank Without<br/>Boundaries</h2>
+    <p class="reveal reveal-d2">Download the source, run the app, and experience banking that actually makes sense.</p>
+    <a href="#demo" class="btn-glow reveal reveal-d3">Try the Live Demo</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo" style="font-size:1.1rem">NovaPay</div>
+  <div class="ft-note">// built with Python · NovaPay Engine v2.0</div>
+  <div class="ft-links">
+    <a href="#features">Features</a>
+    <a href="#how">Process</a>
+    <a href="#kyc">KYC</a>
+  </div>
+</footer>
+
+<script>
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cursor.style.left=mx+'px';cursor.style.top=my+'px';
+});
+function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}animRing();
+document.querySelectorAll('a,button,.feat-card,.tab').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{
+    cursor.style.width='20px';cursor.style.height='20px';cursor.style.opacity='0.5';
+    ring.style.width='54px';ring.style.height='54px';
+  });
+  el.addEventListener('mouseleave',()=>{
+    cursor.style.width='12px';cursor.style.height='12px';cursor.style.opacity='1';
+    ring.style.width='36px';ring.style.height='36px';
+  });
+});
+
+// ── PARTICLES ──
+const canvas=document.getElementById('particles-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+
+function Particle(){
+  this.x=Math.random()*W;
+  this.y=Math.random()*H;
+  this.vx=(Math.random()-0.5)*0.3;
+  this.vy=(Math.random()-0.5)*0.3;
+  this.r=Math.random()*1.5+0.3;
+  this.a=Math.random()*0.6+0.1;
+  this.color=Math.random()>0.6?'0,245,255':'0,102,255';
+}
+Particle.prototype.update=function(){
+  this.x+=this.vx;this.y+=this.vy;
+  if(this.x<0||this.x>W)this.vx*=-1;
+  if(this.y<0||this.y>H)this.vy*=-1;
+};
+
+for(let i=0;i<100;i++)particles.push(new Particle());
+
+function drawParticles(){
+  ctx.clearRect(0,0,W,H);
+  // Draw connections
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(0,245,255,${(1-dist/120)*0.12})`;
+        ctx.lineWidth=0.6;
+        ctx.stroke();
+      }
+    }
+  }
+  // Draw dots
+  particles.forEach(p=>{
+    p.update();
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(${p.color},${p.a})`;
+    ctx.shadowBlur=p.r*4;
+    ctx.shadowColor=`rgba(${p.color},0.5)`;
+    ctx.fill();
+    ctx.shadowBlur=0;
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── 3D TILT ──
+const shell=document.getElementById('tiltShell');
+const inner=document.getElementById('tiltInner');
+shell.addEventListener('mousemove',e=>{
+  const rect=shell.getBoundingClientRect();
+  const x=((e.clientX-rect.left)/rect.width-0.5)*2;
+  const y=((e.clientY-rect.top)/rect.height-0.5)*2;
+  inner.style.transform=`rotateY(${x*12}deg) rotateX(${-y*8}deg) scale(1.02)`;
+});
+shell.addEventListener('mouseleave',()=>{
+  inner.style.transform='rotateY(0deg) rotateX(0deg) scale(1)';
+});
+
+// ── BANKING STATE ──
+let balance=0,txns=[];
+
+function fmtINR(n){return '₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2})}
+
+function updateBal(){
+  const el=document.getElementById('balDisp');
+  el.textContent=fmtINR(balance);
+  el.style.textShadow=balance>0?'0 0 30px rgba(0,245,255,0.4)':'none';
+  const sub=document.getElementById('balSub');
+  if(balance>0){
+    sub.innerHTML='<span style="color:var(--green)">●</span><span style="color:var(--green)">'+fmtINR(balance)+' available</span>';
+  } else {
+    sub.innerHTML='<span>●</span><span>Ready to transact</span>';
+  }
+}
+
+function showMsg(id,txt,ok){
+  const el=document.getElementById(id);
+  el.textContent=txt;
+  el.className='feedback '+(ok?'ok':'err');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.className='feedback'},3000);
+}
+
+function addTxn(type,amt){
+  txns.unshift({type,amt,t:new Date().toLocaleTimeString()});
+  renderTxns();
+}
+
+function renderTxns(){
+  const el=document.getElementById('txnList');
+  if(!txns.length){
+    el.innerHTML='<div class="empty-state">No transactions yet. Make your first deposit!</div>';
+    return;
+  }
+  el.innerHTML=txns.slice(0,7).map(t=>`
+    <div class="txn">
+      <div class="txn-ic ${t.type}">${t.type==='d'?'↑':'↓'}</div>
+      <div style="flex:1">
+        <div class="txn-nm">${t.type==='d'?'Deposit':'Withdrawal'}</div>
+        <div class="txn-t">${t.t}</div>
+      </div>
+      <div class="txn-amt ${t.type}">${t.type==='d'?'+':'-'}${fmtINR(t.amt)}</div>
+    </div>`).join('');
+}
+
+function doDeposit(){
+  const v=parseFloat(document.getElementById('depInp').value);
+  if(!v||v<=0){showMsg('depMsg','✗ Enter a valid positive amount',false);return}
+  balance+=v;updateBal();addTxn('d',v);
+  showMsg('depMsg','✓ '+fmtINR(v)+' deposited successfully',true);
+  document.getElementById('depInp').value='';
+}
+
+function doWithdraw(){
+  const v=parseFloat(document.getElementById('witInp').value);
+  if(!v||v<=0){showMsg('witMsg','✗ Enter a valid positive amount',false);return}
+  if(v>balance){showMsg('witMsg','✗ Insufficient balance — deposit first',false);return}
+  balance-=v;updateBal();addTxn('w',v);
+  showMsg('witMsg','✓ '+fmtINR(v)+' withdrawn successfully',true);
+  document.getElementById('witInp').value='';
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    t.classList.toggle('on',['dep','wit','his','kyc'][i]===id);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pan-'+id).classList.add('on');
+}
+
+// Enter key
+document.getElementById('depInp').addEventListener('keydown',e=>{if(e.key==='Enter')doDeposit()});
+document.getElementById('witInp').addEventListener('keydown',e=>{if(e.key==='Enter')doWithdraw()});
+document.getElementById('kycNum').addEventListener('keydown',e=>{if(e.key==='Enter')addKYC()});
+
+// ── KYC ──
+let kycDocs = {};
+
+const kycIcons = {
+  'aadhaar':'🪪','pan':'📄','passport':'📘','driving':'🚗','voter':'🗳️','birth':'📋'
+};
+function getKycIcon(type){
+  const t = type.toLowerCase();
+  for(const k in kycIcons){ if(t.includes(k)) return kycIcons[k]; }
+  return '📑';
+}
+
+function addKYC(){
+  const type = document.getElementById('kycType').value.trim();
+  const num  = document.getElementById('kycNum').value.trim();
+  if(!type){ showMsg('kycMsg','✗ Enter a document type',false); return; }
+  if(!num){  showMsg('kycMsg','✗ Enter a document number',false); return; }
+  kycDocs[type] = num;
+  renderKYC();
+  showMsg('kycMsg','✓ '+type+' added successfully',true);
+  document.getElementById('kycType').value='';
+  document.getElementById('kycNum').value='';
+  // Also update the KYC section card
+  updateKYCSection();
+}
+
+function deleteKYC(type){
+  delete kycDocs[type];
+  renderKYC();
+  updateKYCSection();
+}
+
+function renderKYC(){
+  const el = document.getElementById('kycList');
+  const keys = Object.keys(kycDocs);
+  if(!keys.length){
+    el.innerHTML='<div class="empty-state">No KYC documents added yet.</div>';
+    return;
+  }
+  el.innerHTML = keys.map(k=>`
+    <div class="txn" style="align-items:center">
+      <div class="txn-ic d" style="font-size:1rem;width:34px;height:34px">${getKycIcon(k)}</div>
+      <div style="flex:1">
+        <div class="txn-nm">${k}</div>
+        <div class="txn-t" style="font-family:'Space Mono',monospace">${kycDocs[k]}</div>
+      </div>
+      <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+        color:var(--green);background:rgba(0,255,157,0.08);border:1px solid rgba(0,255,157,0.2);
+        padding:0.2rem 0.55rem;border-radius:100px;margin-right:0.5rem">✓ Verified</span>
+      <button onclick="deleteKYC('${k}')" style="background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.2);
+        color:var(--red);border-radius:6px;padding:0.25rem 0.55rem;font-size:0.7rem;cursor:pointer;
+        font-family:'Syne',sans-serif;font-weight:700;transition:all 0.2s"
+        onmouseover="this.style.background='rgba(255,68,102,0.2)'"
+        onmouseout="this.style.background='rgba(255,68,102,0.1)'">✕</button>
+    </div>`).join('');
+}
+
+function updateKYCSection(){
+  const el = document.getElementById('kycSectionList');
+  if(!el) return;
+  const keys = Object.keys(kycDocs);
+  if(!keys.length){
+    el.innerHTML='<div class="kyc-row2"><div style="font-size:0.82rem;color:var(--muted);padding:0.5rem 0">No documents added yet. Use the demo above to add KYC documents.</div></div>';
+    return;
+  }
+  el.innerHTML = keys.map(k=>`
+    <div class="kyc-row2">
+      <div class="kyc-ic">${getKycIcon(k)}</div>
+      <div>
+        <div class="kyc-nm">${k}</div>
+        <div class="kyc-no">${kycDocs[k]}</div>
+      </div>
+      <span class="kyc-badge">✓ Verified</span>
+    </div>`).join('');
+}
+
+// ── SCROLL REVEAL ──
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
